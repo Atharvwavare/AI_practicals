@@ -1,0 +1,55 @@
+import numpy as np
+
+# BLOCK 1
+# Function to calculate distance between 2 cities
+def distance(city1, city2):
+    return np.sqrt((city1[0] - city2[0])**2 + (city1[1] - city2[1])**2)
+
+
+
+# BLOCK 2
+# Nearest Neighbor algorithm to find TSP tour
+def tsp_nearest_neighbour(cities):
+    no_of_cities = len(cities)
+    unvisited_cities = list(range(no_of_cities))
+    tour = []
+
+    # Start from a random city
+    current_city = np.random.choice(unvisited_cities)
+    unvisited_cities.remove(current_city)
+    tour.append(current_city)
+
+    while unvisited_cities:
+        nearest_city = min(unvisited_cities, key=lambda city: distance(cities[current_city], cities[city]))
+        unvisited_cities.remove(nearest_city)
+        tour.append(nearest_city)
+        current_city = nearest_city
+
+    return tour
+
+
+
+# BLOCK 3
+# Function to calculate total tour distance
+def total_tour_distance(tour, cities):
+    total = 0
+    for i in range(len(tour)):
+        total += distance(cities[tour[i]], cities[tour[(i + 1) % len(tour)]])
+    return total
+
+
+
+# BLOCK 4
+# Seed point for reproducibility
+np.random.seed(42)
+
+# List of city coordinates
+cities = [(5, 5), (10, 10), (15, 5), (10, 0), (0, 0)]
+
+# Solve TSP
+tour = tsp_nearest_neighbour(cities)
+total_distance = total_tour_distance(tour, cities)
+
+# Print results
+print("Optimal Tour:", tour)
+print("Total Distance:", total_distance)
