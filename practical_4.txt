@@ -1,71 +1,48 @@
-def bubble_sort(arr):
-    n = len(arr)
+import nltk
 
-    for i in range(n):
-        for j in range(0, n-i-1):
-            if arr[j] > arr[j+1]:
-                arr[j], arr[j+1] = arr[j+1], arr[j]
+nltk.download('punkt')
+nltk.download('punkt_tab')
+nltk.download('stopwords')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('averaged_perceptron_tagger_eng')
 
-def selection_sort(arr):
-    n = len(arr)
+from nltk import word_tokenize, FreqDist, pos_tag
+from nltk.corpus import stopwords
 
-    for i in range(n):
-        min_index = i
-        for j in range(i+1, n):
-            if arr[j] < arr[min_index]:
-                min_index = j
+def text_tokenization(text):
+    return word_tokenize(text)
 
-        arr[i], arr[min_index] = arr[min_index], arr[i]
+def count_word_frequency(tokens):
+    return FreqDist(tokens)
 
-def merge_sort(arr):
-    if len(arr) > 1:
-        mid = len(arr) // 2
-        left_half = arr[:mid]
-        right_half = arr[mid:]
+def remove_stop_words(tokens):
+    stop_words = set(stopwords.words('english'))
+    return [word for word in tokens if word.lower() not in stop_words]
 
-        merge_sort(left_half)
-        merge_sort(right_half)
+def pos_tagging(tokens):
+    return pos_tag(tokens)
 
-        i = j = k = 0
+# Get user input
+text = input("Enter a sentence or a paragraph: ")
 
-        while i < len(left_half) and j < len(right_half):
-            if left_half[i] < right_half[j]:
-                arr[k] = left_half[i]
-                i += 1
-            else:
-                arr[k] = right_half[j]
-                j += 1
-            k += 1
+# Ask user which operation to perform
+operation = input("Select operation (a. Tokenization, b. Word Frequency, c. Remove Stop Words, d. POS Tagging): ").lower()
 
-        while i < len(left_half):
-            arr[k] = left_half[i]
-            i += 1
-            k += 1
-
-        while j < len(right_half):
-            arr[k] = right_half[j]
-            j += 1
-            k += 1
-
-# Get user input for array
-input_str = input("Enter space-separated integers for the array: ")
-arr = list(map(int, input_str.split()))
-
-# Get user input for sorting method
-sorting_method = input("Enter sorting method (bubble/selection/merge): ").lower()
-
-# Perform the selected sorting method
-if sorting_method == 'bubble':
-    bubble_sorted_arr = list(arr)
-    bubble_sort(bubble_sorted_arr)
-    print("Bubble Sorted Array:", bubble_sorted_arr)
-elif sorting_method == 'selection':
-    selection_sorted_arr = list(arr)
-    selection_sort(selection_sorted_arr)
-    print("Selection Sorted Array:", selection_sorted_arr)
-elif sorting_method == 'merge':
-    merge_sorted_arr = list(arr)
-    merge_sort(merge_sorted_arr)
-    print("Merge Sorted Array:", merge_sorted_arr)
+# Perform the selected operation
+if operation == 'a':
+    tokens = text_tokenization(text)
+    print("Tokens:", tokens)
+elif operation == 'b':
+    tokens = text_tokenization(text)
+    word_frequency = count_word_frequency(tokens)
+    print("Word Frequency:", dict(word_frequency))
+elif operation == 'c':
+    tokens = text_tokenization(text)
+    tokens_without_stopwords = remove_stop_words(tokens)
+    print("Tokens without Stop Words:", tokens_without_stopwords)
+elif operation == 'd':
+    tokens = text_tokenization(text)
+    pos_tags = pos_tagging(tokens)
+    print("POS Tags:", pos_tags)
 else:
-    print("Invalid sorting method. Please enter 'bubble', 'selection', or 'merge'.")
+    print("Invalid operation. Please select a, b, c, or d.")
