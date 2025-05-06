@@ -11,7 +11,7 @@
 
  1) Go to the Terminal
 
- 2) type command  =  Jupyter Notebook
+ 2) type command  =  jupyter notebook
 
  3) It will run some stuff,after that it will open a page 
 
