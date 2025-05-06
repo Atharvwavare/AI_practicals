@@ -1,47 +1,58 @@
-import random
+from queue import Queue
 
-def calculate_heuristic(board):
-    n = len(board)
-    conflicts = 0
-    for i in range(n):
-        for j in range(i + 1, n):
-            if board[i] == board[j] or abs(board[i] - board[j]) == abs(i - j):
-                conflicts += 1
-    return conflicts
+def water_jug_bfs(capacity_jug1, capacity_jug2, target):
+    visited_states = set()
+    q = Queue()
 
-def hill_climbing(n, max_restarts=1000):
-    for _ in range(max_restarts):
-        current_board = [random.randint(0, n-1) for _ in range(n)]
-        current_heuristic = calculate_heuristic(current_board)
+    # Each element in the queue will store: (jug1, jug2, path_taken)
+    q.put((0, 0, []))
 
-        while True:
-            neighbor = None
-            min_heuristic = current_heuristic
+    while not q.empty():
+        jug1, jug2, path = q.get()
 
-            for col in range(n):
-                for row in range(n):
-                    if current_board[col] != row:
-                        new_board = list(current_board)
-                        new_board[col] = row
-                        new_heuristic = calculate_heuristic(new_board)
-                        if new_heuristic < min_heuristic:
-                            neighbor = new_board
-                            min_heuristic = new_heuristic
+        # If this state is already visited, skip it
+        if (jug1, jug2) in visited_states:
+            continue
 
-            if neighbor is None:
-                break  # Local minimum
-            current_board = neighbor
-            current_heuristic = min_heuristic
+        # Mark the state as visited
+        visited_states.add((jug1, jug2))
 
-            if current_heuristic == 0:
-                return current_board
+        # Add current state to path
+        current_path = path + [(jug1, jug2)]
 
-    return None  # Failed after max_restarts
+        # If we found the exact target state
+        if (jug1, jug2) == target:
+            return current_path
+
+        # All possible next operations
+        possible_states = [
+            (capacity_jug1, jug2),  # Fill jug1
+            (jug1, capacity_jug2),  # Fill jug2
+            (0, jug2),              # Empty jug1
+            (jug1, 0),              # Empty jug2
+            # Pour jug1 -> jug2
+            (jug1 - min(jug1, capacity_jug2 - jug2), jug2 + min(jug1, capacity_jug2 - jug2)),
+            # Pour jug2 -> jug1
+            (jug1 + min(jug2, capacity_jug1 - jug1), jug2 - min(jug2, capacity_jug1 - jug1))
+        ]
+
+        # Add next states to the queue
+        for state in possible_states:
+            if state not in visited_states:
+                q.put((state[0], state[1], current_path))
+
+    return None  # No solution found
 
 # Example usage
-n = 4
-solution = hill_climbing(n)
-if solution:
-    print("N-Queens Solution:", solution)
+capacity_jug1 = 5
+capacity_jug2 = 4
+target = (0,2)  # Looking for Jug1 = 0L and Jug2 = 2L
+
+result_path = water_jug_bfs(capacity_jug1, capacity_jug2, target)
+
+if result_path:
+    print("Water Jug Solution Path:")
+    for step in result_path:
+        print(f"Jug1: {step[0]}L, Jug2: {step[1]}L")
 else:
     print("No solution found.")
